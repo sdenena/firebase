@@ -14,10 +14,24 @@ import { Container,
         Body,
         Title,
         Button,
-        Icon
+        Icon,
+        List
         } from 'native-base';
 
+    import {ListView} from 'react-native'
+
 import {FireBase} from './Firebase'
+
+const datas = [
+    'Simon Mignolet',
+    'Nathaniel Clyne',
+    'Dejan Lovren',
+    'Mama Sakho',
+    'Alberto Moreno',
+    'Emre Can',
+    'Joe Allen',
+    'Phil Coutinho',
+  ];
 
 export default class Chat extends Component {
     constructor(props){
@@ -26,6 +40,7 @@ export default class Chat extends Component {
             userInput:'',
             messgeList:[]
         }
+        this.ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
     }
 
     componentWillMount(){
@@ -49,6 +64,7 @@ export default class Chat extends Component {
   render() {
 
     console.log("=>message:",this.state.messgeList[1])
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
     return (
       <Container>
         <Header>
@@ -56,25 +72,24 @@ export default class Chat extends Component {
             <Title>Chat Box</Title>
           </Body>
         </Header>
-        <Content>
-         {
-             this.state.messgeList.map((list,i)=>{
-                 
-                 <ListItem key={i}>
-                    <Left>
-                      <Text>{list}</Text>
-                    </Left>
-                 </ListItem>
-             })
-         }
-          {/* <ListItem>
-            <Left>
-              <Text>Discussion with Client</Text>
-            </Left>
-            <Right>
-              <Radio selected={true} />
-            </Right>
-          </ListItem>         */}
+        <Content ref={c => this.mylist = c}>
+        <List dataSource={this.ds.cloneWithRows(this.state.messgeList)}
+            leftOpenValue={75}
+            rightOpenValue={-75}
+            dataSource={this.ds.cloneWithRows(this.state.messgeList)}
+            renderRow={(data,index,obj) =>
+              <ListItem key={obj}>
+                <Text> {data} </Text>
+              </ListItem>}
+            renderLeftHiddenRow={data =>
+              <Button full onPress={() => alert(data)}>
+                <Icon active name="information-circle" />
+              </Button>}
+            renderRightHiddenRow={(data, secId, rowId, rowMap) =>
+              <Button full danger onPress={_ => this.deleteRow(secId, rowId, rowMap)}>
+                <Icon active name="trash" />
+              </Button>}
+          />
         </Content>
         <Footer>
             <Left>
